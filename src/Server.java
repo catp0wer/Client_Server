@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server
 {
@@ -23,13 +24,15 @@ public class Server
 
             System.out.println("Main: Starting infinite loop");
             int clientNumber = 1;
+            ArrayList<Socket> connectedClients = new ArrayList<>();
             while(true)
             {
                 System.out.println("Main: Blocking while waiting for a new client");
                 socket = serverSocket.accept();
+                connectedClients.add(socket);
                 String clientName = "Client"+Integer.toString(clientNumber);
 
-                MyRunnable myRun = new MyRunnable(socket,clientName);
+                MyRunnable myRun = new MyRunnable(socket,clientName,connectedClients);
                 new Thread(myRun).start();
                 clientNumber++;
 //                MyRunnable myRun2 = new MyRunnable(socket,"Thread2");

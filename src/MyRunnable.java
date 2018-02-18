@@ -1,16 +1,20 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Random;
 
 
 public class MyRunnable implements Runnable {
     String threadName;
     Socket socket;
+    ArrayList<Socket> allClients;
+
     Random myRan = new Random();
 
-    public MyRunnable(Socket socket, String threadName) {
+    public MyRunnable(Socket socket, String threadName, ArrayList<Socket> allClients) {
         this.socket = socket;
         this.threadName = threadName;
+        this.allClients = allClients;
     }
 
     public void run() {
@@ -36,13 +40,23 @@ public class MyRunnable implements Runnable {
                 } catch (NumberFormatException e) {
                     returnMessage = "The message is not a number ";
                 }
-                OutputStream os = socket.getOutputStream();
-                OutputStreamWriter osw = new OutputStreamWriter(os);
-                BufferedWriter bw = new BufferedWriter(osw);
-                bw.write(returnMessage);
-                System.out.println(threadName+"Message sent to the client is " + returnMessage);
-                bw.flush();
+                for(Socket clientSocket: allClients) {
+                    OutputStream os = clientSocket.getOutputStream();
+                    OutputStreamWriter osw = new OutputStreamWriter(os);
+                    BufferedWriter bw = new BufferedWriter(osw);
+                    bw.write(returnMessage);
+                    System.out.println(threadName + "Message sent to the client is " + returnMessage);
+                    bw.flush();
+                }
 
+//                for(int i=0;i< allClients.size();i++) {
+//                    OutputStream os = allClients.get(i).getOutputStream();
+//                    OutputStreamWriter osw = new OutputStreamWriter(os);
+//                    BufferedWriter bw = new BufferedWriter(osw);
+//                    bw.write(returnMessage);
+//                    System.out.println(threadName + "Message sent to the client is " + returnMessage);
+//                    bw.flush();
+//                }
                 try {
 
                     Thread.sleep(myRan.nextInt(2000));
