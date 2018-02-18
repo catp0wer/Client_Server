@@ -16,46 +16,24 @@ public class Server
         try
         {
 
-            int port = 45000;
+            int port = 45002;
             ServerSocket serverSocket = new ServerSocket(port);
-            System.out.println("Server started and listens to the port " + port);
-            System.out.println("Server socket "+serverSocket);
+            System.out.println("Main: Server started and listens to the port " + port);
+            System.out.println("Main: Server socket "+serverSocket);
 
-            System.out.println("Starting infinite loop");
-
+            System.out.println("Main: Starting infinite loop");
+            int clientNumber = 1;
             while(true)
             {
-                System.out.println("Blocking while waiting for a new client");
+                System.out.println("Main: Blocking while waiting for a new client");
                 socket = serverSocket.accept();
-                System.out.println("Got new connection from "+socket);
-                InputStream is = socket.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader br = new BufferedReader(isr);
-                System.out.println("Blocking while waiting a message from client");
-                String num = br.readLine();
-                System.out.println("Message received from client is "+num);
-                    if(num.equals("quit")){
-                        System.out.println("Closing the connection");
-                        break;
-                    }
+                String clientName = "Client"+Integer.toString(clientNumber);
 
-                String returnMessage;
-                try
-                {
-                    int numberInIntFormat = Integer.parseInt(num);
-                    int returnValue = numberInIntFormat*2;
-                    returnMessage = String.valueOf(returnValue) + "\n";
-                }
-                catch(NumberFormatException e)
-                {
-                    returnMessage = "The message is not a number ";
-                }
-                OutputStream os = socket.getOutputStream();
-                OutputStreamWriter osw = new OutputStreamWriter(os);
-                BufferedWriter bw = new BufferedWriter(osw);
-                bw.write(returnMessage);
-                System.out.println("Message sent to the client is "+returnMessage);
-                bw.flush();
+                MyRunnable myRun = new MyRunnable(socket,clientName);
+                new Thread(myRun).start();
+                clientNumber++;
+//                MyRunnable myRun2 = new MyRunnable(socket,"Thread2");
+//                new Thread(myRun2).start();
             }
         }
         catch (Exception e)
@@ -66,7 +44,7 @@ public class Server
         {
             try
             {
-                System.out.println("Closing conection "+socket);
+                System.out.println("Main Closing connection "+socket);
                 socket.close();
             }
             catch(Exception e){}
